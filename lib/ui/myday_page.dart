@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:todoer_app/ui/myday/add_todo_dialog_widget.dart';
 import 'package:todoer_app/ui/myday/mypopup_button.dart';
+import 'package:todoer_app/ui/myday/todo_list_widget.dart';
 
 class MyDayPage extends StatefulWidget {
   const MyDayPage({Key? key}) : super(key: key);
@@ -44,13 +46,19 @@ class _MyDayPageState extends State<MyDayPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
+              ToDoListWidget()
             ],
           ),
         ),
         floatingActionButton: FloatingActionButton(
           backgroundColor: Colors.teal.shade800,
           child: Icon(Icons.add),
-          onPressed: (){},
+          onPressed: () => showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AddToDoDialogWidget();
+            },
+          ),
         ),
       ),
     );

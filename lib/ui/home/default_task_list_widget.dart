@@ -1,6 +1,5 @@
 
 import 'package:flutter/material.dart';
-import 'package:todoer_app/ui/myday_page.dart';
 
 class DefaultTaskListTileWidget extends StatelessWidget {
 
