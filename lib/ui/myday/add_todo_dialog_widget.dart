@@ -1,7 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todoer_app/model/todo_model.dart';
 import 'package:todoer_app/provider/todo_provider.dart';
+import 'package:todoer_app/routes/routes.dart';
 
 class AddToDoDialogWidget extends StatefulWidget {
   const AddToDoDialogWidget({Key? key}) : super(key: key);
@@ -11,6 +14,8 @@ class AddToDoDialogWidget extends StatefulWidget {
 }
 
 class _AddToDoDialogWidgetState extends State<AddToDoDialogWidget> {
+  //final _fireStore = FirebaseFirestore.instance;
+
   final _formKey = GlobalKey<FormState>();
   String title = '';
   @override
@@ -22,8 +27,16 @@ class _AddToDoDialogWidgetState extends State<AddToDoDialogWidget> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ToDoFormWidget(
-            onChangedTitle: (title) => setState(() => this.title = title),
-            onSavedTodo: addTodo,
+            onChangedTitle: (title){
+              setState(() => this.title = title);
+            },
+            onSavedTodo: (){
+              addTodo();
+              // _fireStore
+              //     .collection('/todos/')
+              //     .add({'task': title}
+              // );
+            },
           )
         ],
       ),
@@ -32,19 +45,17 @@ class _AddToDoDialogWidgetState extends State<AddToDoDialogWidget> {
 
   void addTodo() {
     final isValid = _formKey.currentState!.validate();
-    if(!isValid){
+    if (!isValid) {
       return;
-    }
-    else{
+    } else {
       final todo = ToDo(
-        id:DateTime.now().toString(),
+        id: DateTime.now().toString(),
         dateTime: DateTime.now(),
         title: title,
         isDone: false,
       );
-      final provider = Provider.of<ToDosProvider>(context,listen: false);
-      provider.addTodo(todo);
-      Navigator.of(context).pop();
+      Provider.of<ToDosProvider>(context,listen: false).addTodo(todo);
+      Navigator.of(context).popAndPushNamed(TodoerRoutes.MyDayPageRoute);
     }
   }
 }
@@ -65,6 +76,7 @@ class ToDoFormWidget extends StatefulWidget {
 }
 
 class _ToDoFormWidgetState extends State<ToDoFormWidget> {
+
   late Color buttonColor = Colors.grey.shade800;
 
   @override
@@ -72,32 +84,37 @@ class _ToDoFormWidgetState extends State<ToDoFormWidget> {
     return Material(
       child: Padding(
         padding: const EdgeInsets.all(20.0),
-        child: Column(
-          children: [
-            Container(
-              width: double.infinity,
-              height: 50,
-              child: Row(
-                children: [
-                  buildTitle(),
-                  buildButton(),
-                ],
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Container(
+                width: double.infinity,
+                height: 50,
+                child: Row(
+                  children: [
+                    buildTitle(),
+                    buildButton(),
+                  ],
+                ),
               ),
-            ),
-            Container(
-              width: double.infinity,
-              height: 50,
-              child: Row(
-                children: [
-                  buildRowElements(icon: Icons.calendar_today_outlined,label: 'Set due date'),
-                  Spacer(),
-                  buildRowElements(icon: Icons.doorbell_rounded,label: 'Remind me'),
-                  Spacer(),
-                  buildRowElements(icon: Icons.repeat,label: 'Repeat'),
-                ],
+              Container(
+                width: double.infinity,
+                height: 50,
+                child: Row(
+                  children: [
+                    buildRowElements(
+                        icon: Icons.calendar_today_outlined,
+                        label: 'Set due date'),
+                    Spacer(),
+                    buildRowElements(
+                        icon: Icons.doorbell_rounded, label: 'Remind me'),
+                    Spacer(),
+                    buildRowElements(icon: Icons.repeat, label: 'Repeat'),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -108,16 +125,16 @@ class _ToDoFormWidgetState extends State<ToDoFormWidget> {
           maxLines: 10,
           cursorHeight: 20,
           onChanged: widget.onChangedTitle,
-          validator: (title){
-            if(title!.isEmpty){
+          validator: (title) {
+            if (title!.isEmpty) {
               return 'can\'t be empty';
             }
-            if(title.isNotEmpty){
+            if (title.isNotEmpty) {
               setState(() {
-                buttonColor=Colors.indigo.shade800;
+                buttonColor = Colors.indigo.shade800;
               });
             }
-              return null;
+            return null;
           },
           decoration: InputDecoration(
               //border: UnderlineInputBorder(),
@@ -132,77 +149,36 @@ class _ToDoFormWidgetState extends State<ToDoFormWidget> {
         ),
       );
 
-  Widget buildButton() => Container(
-        width: 25,
-        height: 35,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(5),
-          color: buttonColor,
-        ),
-        child: InkWell(
-          child: Icon(
-            Icons.arrow_upward,
-            color: Colors.white,
-            size: 25,
-          ),
-          onTap: widget.onSavedTodo,
-        ),
-      );
-
-  Widget buildRowElements({required IconData icon, required String label }) => Row(
-    children: [
-      Icon(icon),
-      Padding(
-        padding: const EdgeInsets.all(5.0),
-        child: Text(
-          label,
-          style: TextStyle(
-              color: Colors.grey,
-              fontSize: 15
-          ),
-        ),
+  Widget buildButton() {
+    return Container(
+      width: 25,
+      height: 35,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(5),
+        color: buttonColor,
       ),
-    ],
-  );
+      child: InkWell(
+        child: Icon(
+          Icons.arrow_upward,
+          color: Colors.white,
+          size: 25,
+        ),
+        onTap: widget.onSavedTodo
+      ),
+    );
+  }
+
+  Widget buildRowElements({required IconData icon, required String label}) =>
+      Row(
+        children: [
+          Icon(icon),
+          Padding(
+            padding: const EdgeInsets.all(5.0),
+            child: Text(
+              label,
+              style: TextStyle(color: Colors.grey, fontSize: 15),
+            ),
+          ),
+        ],
+      );
 }
-  // Widget buildRow() => Row(
-  //   children: [
-  //     Icon(Icons.calendar_today_outlined),
-  //     Padding(
-  //       padding: const EdgeInsets.all(8.0),
-  //       child: Text(
-  //           'Set due date',
-  //         style: TextStyle(
-  //           color: Colors.grey,
-  //           fontSize: 15
-  //         ),
-  //       ),
-  //     ),
-  //     Spacer(),
-  //     Icon(Icons.doorbell_rounded),
-  //     Padding(
-  //       padding: const EdgeInsets.all(8.0),
-  //       child: Text(
-  //         'Remind me',
-  //         style: TextStyle(
-  //             color: Colors.grey,
-  //             fontSize: 15
-  //         ),
-  //       ),
-  //     ),
-  //     Spacer(),
-  //     Icon(Icons.repeat),
-  //     Padding(
-  //       padding: const EdgeInsets.all(8.0),
-  //       child: Text(
-  //         'Repeat',
-  //         style: TextStyle(
-  //             color: Colors.grey,
-  //             fontSize: 15
-  //         ),
-  //       ),
-  //     ),
-  //   ],
-  // );
-
-

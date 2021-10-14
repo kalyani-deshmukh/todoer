@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:todoer_app/routes/routes.dart';
 
 class DefaultTaskListTileWidget extends StatelessWidget {
 
@@ -18,14 +19,7 @@ class DefaultTaskListTileWidget extends StatelessWidget {
         contentPadding: EdgeInsets.only(right: 15, left: 15),
         dense: true,
         onTap: () {
-          /*
-        Navigator.pushNamed(
-          context,
-          'todoListRoute',
-          arguments: TodoListRouteArguments('Untitled Task', true)
-          */
-          Navigator.pushNamed(context, '/myday');
-
+          Navigator.of(context).pushReplacementNamed(TodoerRoutes.MyDayPageRoute );
         }
     );
   }

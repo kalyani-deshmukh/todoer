@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:todoer_app/database/database.dart';
 import 'package:todoer_app/model/todo_model.dart';
 
 class ToDosProvider extends ChangeNotifier{
@@ -6,12 +8,12 @@ class ToDosProvider extends ChangeNotifier{
     ToDo(
         dateTime: DateTime.now(),
         isDone: false,
-        title: "Go For Shopping Bitch!"
+        title: "Take a power nap"
     ),
     ToDo(
         dateTime: DateTime.now(),
         isDone: false,
-        title: "gym Bitch!"
+        title: "Do a load of laundry"
     ),
     ToDo(
         dateTime: DateTime.now(),
@@ -25,10 +27,20 @@ class ToDosProvider extends ChangeNotifier{
     ),
   ];
 
-  List<ToDo> get todos => _todos;
+  List<ToDo> get todos => [..._todos];
 
   void addTodo(ToDo todo) {
     _todos.add(todo);
+    // FirebaseFirestore.instance
+    //     .collection('/todos/')
+    //     .add({
+    //   'task': todo.title,
+    //   'dateTime':todo.dateTime,
+    //   'isDone': todo.isDone,
+    //     }
+    // );
+
+    Database.addItem(title: todo.title, dateTime: todo.dateTime, isDone: todo.isDone);
     notifyListeners();
   }
 

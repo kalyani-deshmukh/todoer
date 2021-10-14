@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:todoer_app/routes/routes.dart';
 
 
 class SplashPage extends StatefulWidget {
@@ -11,6 +13,8 @@ class SplashPage extends StatefulWidget {
 class SplashPageState extends State<SplashPage>
     with SingleTickerProviderStateMixin {
   var _visible = true;
+  final user = FirebaseAuth.instance.currentUser;
+
 
   late AnimationController animationController;
   late Animation<double> animation;
@@ -21,7 +25,11 @@ class SplashPageState extends State<SplashPage>
   }
 
   void navigationPage() {
-    Navigator.of(context).pushReplacementNamed('/login');
+    if(user==null){
+    Navigator.of(context).pushReplacementNamed(TodoerRoutes.LoginPageRoute);
+    }else{
+    Navigator.of(context).pushReplacementNamed(TodoerRoutes.HomePageRoute);
+    }
   }
 
   @override
